@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import useAxiosCommon from '../../hooks/useAxiosCommon'
 
 const Card = ({ room }) => {
+  const axiosCommon=useAxiosCommon();
+  
   return (
     <Link to={`/room/${room?._id}`} className='col-span-1 cursor-pointer group'>
       <div className='flex flex-col gap-2 w-full'>
@@ -15,13 +18,15 @@ const Card = ({ room }) => {
             '
         >
           <img
-            className='
-                object-cover 
+            className={`
+              object-cover 
                 h-full 
                 w-full 
                 group-hover:scale-110 
+                hover:
+                
                 transition
-              '
+              `}
             src={room?.image}
             alt='Room'
           />

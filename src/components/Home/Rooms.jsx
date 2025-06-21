@@ -3,22 +3,25 @@ import Card from './Card'
 import Container from '../Shared/Container'
 import Heading from '../Shared/Heading'
 import LoadingSpinner from '../Shared/LoadingSpinner'
+import useAxiosSecure from '../../hooks/useAxiosSecure'
+import { useQuery } from '@tanstack/react-query'
+import EmptyRoom from '../NoDataFound/EmptyRoom'
+import { useSearchParams } from 'react-router-dom'
 
 const Rooms = () => {
-  const [rooms, setRooms] = useState([])
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    setLoading(true)
-    fetch(`./rooms.json`)
-      .then(res => res.json())
-      .then(data => {
-        setRooms(data)
-        setLoading(false)
-      })
-  }, [])
-
-  if (loading) return <LoadingSpinner />
+  // 3 get category in rooms
+  const [params,setParams]=useSearchParams();
+  const category=params.get("category")
+  
+  const axiosSecure=useAxiosSecure();
+  const {data:rooms=[],isLoading}=useQuery({
+    queryKey:['rooms',category],
+    queryFn:async()=>{
+      const {data}=await axiosSecure.get(`/rooms?category=${category}`);
+      return data
+    }
+  })
+  if (isLoading) return <LoadingSpinner />
 
   return (
     <Container>
@@ -29,13 +32,7 @@ const Rooms = () => {
           ))}
         </div>
       ) : (
-        <div className='flex items-center justify-center min-h-[calc(100vh-300px)]'>
-          <Heading
-            center={true}
-            title='No Rooms Available In This Category!'
-            subtitle='Please Select Other Categories.'
-          />
-        </div>
+        <EmptyRoom></EmptyRoom>
       )}
     </Container>
   )
