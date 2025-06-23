@@ -30,8 +30,7 @@ const Navbar = () => {
         status: "Requested",
       };
 
-      const { data } = await axiosSecure.put(`/user`, userInto);
-      
+      const { data } = await axiosSecure.put(`/user`, userInto);j
       if(data.modifiedCount>0){
         toast.success("Request success ! please wait for admin confirmation!")
         
