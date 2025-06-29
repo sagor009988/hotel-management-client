@@ -1,13 +1,28 @@
 import { Helmet } from "react-helmet-async";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import useAuth from "../../../hooks/useAuth";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import BookingDataRow from "../../../components/Dashboard/TableRow/BookingDataRow";
 
 const MyBookings = () => {
+  const {user,loading}=useAuth()
+  const axiosSecure=useAxiosSecure();
+   const {data:bookings=[],isLoading,refetch}=useQuery({
+    queryKey:[],
+    queryFn:async ()=>{
+      const {data}=await axiosSecure.get(`/my-bookings/${user?.email}`);
+      return data
+    }
+   });
+   if(loading || isLoading) return <LoadingSpinner></LoadingSpinner>
   return (
     <>
       <Helmet>
         <title>My Bookings</title>
       </Helmet>
-
-      <div className="container mx-auto px-4 sm:px-8">
+     {
+      bookings.length>0?  <div className="container mx-auto px-4 sm:px-8">
         <div className="py-8">
           <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
             <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
@@ -52,12 +67,15 @@ const MyBookings = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>{/* Table Row Data */}</tbody>
+                <tbody>{/* Table Row Data */}
+                  {bookings&& bookings.map(booking=><BookingDataRow key={booking._id} booking={booking} refetch={refetch}></BookingDataRow>)}
+                </tbody>
               </table>
             </div>
           </div>
         </div>
-      </div>
+      </div> :<p className="h-screen text-center text-3xl flex justify-center items-center">No Bookings</p>
+     }
     </>
   );
 };

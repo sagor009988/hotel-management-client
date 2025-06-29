@@ -8,8 +8,18 @@ import {
 } from "@headlessui/react";
 import { format } from "date-fns";
 import { Fragment } from "react";
+import {loadStripe} from '@stripe/stripe-js';
 
-const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+import {
+  PaymentElement,
+  Elements,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
+import CheckoutForm from "../Form/CheckOutForm";
+
+const BookingModal = ({ closeModal, isOpen, bookingInfo,refetch }) => { 
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -45,17 +55,17 @@ const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
                 </DialogTitle>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Room: {bookingInfo.title}
+                    Room: {bookingInfo?.title}
                   </p>
                 </div>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Location: {bookingInfo.location}
+                    Location: {bookingInfo?.location}
                   </p>
                 </div>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Guest: {bookingInfo.guest.name}
+                    Guest: {bookingInfo?.guest?.name}
                   </p>
                 </div>
                 <div className="mt-2">
@@ -71,26 +81,12 @@ const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
                   </p>
                 </div>
                 <hr className="mt-8 " />
-                {/* checkout form */}
-                <div className="flex mt-2 justify-around">
-                  <button
-                    onClick={() => {
-                      handleRoomDelete(id);
-                      closeModal();
-                    }}
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
-                  >
-                    Book Now
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                </div>
+                <Elements stripe={stripePromise}>
+                  {/* checkout form */}
+                  <CheckoutForm refetch={refetch} closeModal={closeModal} bookingInfo={bookingInfo} ></CheckoutForm>
+                </Elements>
+                
+               
               </DialogPanel>
             </TransitionChild>
           </div>

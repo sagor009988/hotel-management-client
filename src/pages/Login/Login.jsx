@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 
 const Login = () => {
+  
   const navigate = useNavigate();
   const location=useLocation();
   const from=location?.state || "/"
@@ -17,12 +18,12 @@ const Login = () => {
     e.preventDefault();
     const form = e.target;
     const email = form.email.value;
-    setEmail(email);
+    setResetEmail(email);
     const password = form.password.value;
     try {
       setLoading(true);
       await signIn(email, password);
-      await navigate(form);
+       navigate(from);
       toast.success("sign up successfully");
     } catch (err) {
       console.log(err.message);
